@@ -45,11 +45,6 @@ const limiter = rateLimiter({
 });
 app.use(limiter)
 
-app.get("/", (req, res)=>{
-  // debug get req for front end to get a cookie as soon as the user
-  // enters the site
-  res.sendStatus(200)
-})
 
 
 app.post("/signup", userSignUpValidator, async (req, res)=>{
@@ -110,8 +105,6 @@ app.post('/login', async (req, res)=>{
 
       req.session.user = userInfo;
 
-      //console.log("RESULT") // add tokens to cookies
-      //res.send("success") // now go to auth
       res.json({
         message:"Authentication successful!",
         userInfo
@@ -132,5 +125,11 @@ function userSignUpValidator(req, res, next){
   next()
 }
 
+
+function requireAuth (req, res, next){
+  const { user } = req.session;
+  if(!user) return res.sendStatus(403)
+  next()
+}
 
 app.listen(4000)
