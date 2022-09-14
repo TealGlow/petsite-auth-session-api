@@ -35,3 +35,9 @@ exports.createNewUser = async function(user){
   if(res) return 200
   return 500
 }
+
+exports.getUser = async function(user){
+  const result = await userAccount.findOne({username:user.username})
+  if(result) return result
+  else return null
+}
