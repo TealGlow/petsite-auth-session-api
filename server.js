@@ -8,6 +8,8 @@ const helmet = require('helmet') // protect against xss attacks in HTTP headers
 const hpp = require('hpp') // protext against HTTP parameter pollution attack
 const csurf = require('csurf') // protexts against cross-site request forgery
 const rateLimiter = require('express-rate-limit')
+const MongoDBSession = require('connect-mongodb-session')(session)
+
 
 const app = express()
 
@@ -17,6 +19,14 @@ app.use(cors({
   origin:"http://localhost:3000"
 }))
 
+db.connectDb()
+
+const store = new MongoDBSession({
+  uri: process.env.USER_DB_URL,
+  collection: "user_sessions"
+})
+
+
 /*security configs*/
 app.use(helmet())
 app.use(hpp())
@@ -24,18 +34,19 @@ app.use(hpp())
 // session config
 app.use(session({
   secret: process.env.SESSIONS_SECRET,
-  saveUninitialized: true,
+  saveUninitialized: false,
   resave: false,
   cookie:{
     httpOnly: true,
     maxAge: parseInt(process.env.SESSION_MAX_AGE)
-  }
+  },
+  store: store
 }))
 
-app.use((req, res, next)=>{
+/*app.use((req, res, next)=>{
   console.log(req.session),
   next()
-})
+})*/
 
 //app.use(csurf())
 
@@ -45,6 +56,13 @@ const limiter = rateLimiter({
 });
 app.use(limiter)
 
+
+app.get("/", (req, res)=>{
+  console.log(req.session)
+  req.session.isAuth = true;
+  res.send("Hello")
+
+})
 
 
 app.post("/signup", userSignUpValidator, async (req, res)=>{
@@ -70,7 +88,7 @@ app.post("/signup", userSignUpValidator, async (req, res)=>{
         displayName: req.body.displayName,
         email: req.body.email
       }
-        req.session.user = userInfo;
+        //req.session.user = userInfo;
         res.json({
           message: result[1],
           userInfo

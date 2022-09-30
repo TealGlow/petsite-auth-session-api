@@ -1,14 +1,23 @@
 require('dotenv').config({path:__dirname+"/.env"})
 const { MongoClient } = require('mongodb')
 const mongoose = require('mongoose')
+const session = require('express-session')
+
+
+exports.connectDb = ()=>{
+  mongoose.connect(db_url,{
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+
+  var db = mongoose.connection
+
+  db.on('error', console.error.bind(console, "connection error:"))
+}
 
 const db_url = process.env.USER_DB_URL
-console.log(db_url)
-mongoose.connect(db_url)
 
-var db = mongoose.connection
-
-db.on('error', console.error.bind(console, "connection error:"))
+this.connectDb()
 
 const UserSchema = new mongoose.Schema({
   username: {type: String, required: true},
