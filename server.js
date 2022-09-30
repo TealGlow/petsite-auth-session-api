@@ -50,7 +50,6 @@ app.use(limiter)
 app.post("/signup", userSignUpValidator, async (req, res)=>{
   // create a new user
 
-
   try{
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(req.body.password, salt)
@@ -64,7 +63,7 @@ app.post("/signup", userSignUpValidator, async (req, res)=>{
     // create a session and give that cookie to the user
 
     const result = await db.createNewUser(user)
-    if(result == 200){
+    if(result[0] == 200){
       // create cookie and session
       const userInfo = {
         username: req.body.username,
@@ -73,10 +72,12 @@ app.post("/signup", userSignUpValidator, async (req, res)=>{
       }
         req.session.user = userInfo;
         res.json({
-          message:"Successfully created account",
+          message: result[1],
           userInfo
         })
-    }else res.sendStatus(result)
+    }else{
+      res.status(result[0]).json({"message":result[1]})
+    }
   }catch{
     res.sendStatus(500)
   }
