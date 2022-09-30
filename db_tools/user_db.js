@@ -26,15 +26,16 @@ exports.createNewUser = async function(user){
 
   const userCheck = await userAccount.findOne({username:user.username})
   const emailCheck = await userAccount.findOne({email:user.email})
-  if(userCheck || emailCheck) return 409 // username or email exists
+  if(userCheck || emailCheck) return [409, "Username or Email already exists."]
+
 
   const result = await new userAccount(user)
-  if(!result) return 500
+  if(!result) return [500, "Error creating account please try again."]
 
   const res = await result.save()
 
-  if(res) return 200
-  return 500
+  if(res) return [200, "Successfully created new account!"]
+  return [500, "Error creating account please try again."]
 }
 
 exports.getUser = async function(user){
