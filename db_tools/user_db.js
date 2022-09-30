@@ -22,10 +22,11 @@ const UserSchema = new mongoose.Schema({
 var userAccount = mongoose.model('users', UserSchema, 'users')
 
 exports.createNewUser = async function(user){
-  // check if username already exists, if so dont let them enter
+  // check if username OR email already exists, if so dont let them enter
 
   const userCheck = await userAccount.findOne({username:user.username})
-  if(userCheck) return 409 // username exists
+  const emailCheck = await userAccount.findOne({email:user.email})
+  if(userCheck || emailCheck) return 409 // username exists
 
   const result = await new userAccount(user)
   if(!result) return 500
