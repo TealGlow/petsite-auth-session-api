@@ -26,7 +26,7 @@ exports.createNewUser = async function(user){
 
   const userCheck = await userAccount.findOne({username:user.username})
   const emailCheck = await userAccount.findOne({email:user.email})
-  if(userCheck || emailCheck) return 409 // username exists
+  if(userCheck || emailCheck) return 409 // username or email exists
 
   const result = await new userAccount(user)
   if(!result) return 500

@@ -50,8 +50,6 @@ app.use(limiter)
 app.post("/signup", userSignUpValidator, async (req, res)=>{
   // create a new user
 
-  console.log(req)
-
   try{
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(req.body.password, salt)
