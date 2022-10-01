@@ -2,6 +2,7 @@ require('dotenv').config({path:__dirname+"/.env"})
 const { MongoClient } = require('mongodb')
 const mongoose = require('mongoose')
 const session = require('express-session')
+const userAccount = require('./models/userAccount')
 
 
 exports.connectDb = ()=>{
@@ -19,16 +20,6 @@ const db_url = process.env.USER_DB_URL
 
 this.connectDb()
 
-const UserSchema = new mongoose.Schema({
-  username: {type: String, required: true},
-  displayName:{type: String, default: null, trim: true, maxlength: 20},
-  password: {type: String, required: true},
-  email: {type: String, required: true},
-  verifiedAccount: {type: Boolean, default: false},
-  dateCreated: {type: Date, default: Date.now},
-})
-
-var userAccount = mongoose.model('users', UserSchema, 'users')
 
 exports.createNewUser = async function(user){
   // check if username OR email already exists, if so dont let them enter
